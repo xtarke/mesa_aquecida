@@ -17,7 +17,7 @@ uint8_t twiBuffer[2];
 //	i2c_write(data_i2c, data_i2c, PCF_ADDR); _delay_us(1); clr_bit(data_i2c, E_I2C);
 //	i2c_write(data_i2c, data_i2c, PCF_ADDR); _delay_us(45)
 
-#define PULSO_ENABLE() set_bit(twiBuffer[1], E_I2C);  TWI_Start_Transceiver_With_Data( twiBuffer, 2 ); clr_bit(twiBuffer[1], E_I2C); TWI_Start_Transceiver_With_Data( twiBuffer, 2 );
+#define PULSO_ENABLE() SET_BIT(twiBuffer[1], E_I2C);  TWI_Start_Transceiver_With_Data( twiBuffer, 2 ); CLR_BIT(twiBuffer[1], E_I2C); TWI_Start_Transceiver_With_Data( twiBuffer, 2 );
 
 /* Stream para utilizacao do fprintf */
 FILE lcd_str_i2c = FDEV_SETUP_STREAM(lcd_putchar_i2c, NULL, _FDEV_SETUP_WRITE);
@@ -35,9 +35,9 @@ FILE *inic_stream_i2c(){
 void cmd_LCD_i2c(uint8_t c, uint8_t cd)				//c é o dado  e cd indica se é instrução ou caractere
 {
 	if(cd==0)
-		clr_bit(twiBuffer[1], RS_I2C);
+		CLR_BIT(twiBuffer[1], RS_I2C);
 	else
-		set_bit(twiBuffer[1], RS_I2C);
+		SET_BIT(twiBuffer[1], RS_I2C);
 
 	//primeiro nibble de dados - 4 MSB
 	#if (NIBBLE_DADOS_I2C)								//compila código para os pinos de dados do LCD nos 4 MSB do PORT
@@ -72,8 +72,8 @@ void inic_LCD_4bits_i2c()		//sequência ditada pelo fabricando do circuito integ
 	twiBuffer[1] = 0;
 
 	/* Configura pinos de controle */
-	set_bit(twiBuffer[1], RS_I2C);
-	set_bit(twiBuffer[1], E_I2C);
+	SET_BIT(twiBuffer[1], RS_I2C);
+	SET_BIT(twiBuffer[1], E_I2C);
 
 	/* Configure pinos de dados */
 	#if (NIBBLE_DADOS_I2C)
@@ -86,8 +86,8 @@ void inic_LCD_4bits_i2c()		//sequência ditada pelo fabricando do circuito integ
 
 	//i2c_write(data_i2c, data_i2c, PCF_ADDR);
 
-	clr_bit(twiBuffer[1], RS_I2C);	//RS em zero indicando que o dado para o LCD será uma instrução
-	clr_bit(twiBuffer[1], E_I2C);	//pino de habilitação em zero
+	CLR_BIT(twiBuffer[1], RS_I2C);	//RS em zero indicando que o dado para o LCD será uma instrução
+	CLR_BIT(twiBuffer[1], E_I2C);	//pino de habilitação em zero
 
 	TWI_Start_Transceiver_With_Data( twiBuffer, 2 );
 

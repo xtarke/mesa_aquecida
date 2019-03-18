@@ -10,7 +10,7 @@
 #include "LCD.h"
 
 /* sinal de habilitacaoo para o LCD */
-#define PULSO_ENABLE() 	_delay_us(1); set_bit(CONTR_LCD->PORT,E); _delay_us(1); clr_bit(CONTR_LCD->PORT,E); _delay_us(45)
+#define PULSO_ENABLE() 	_delay_us(1); SET_BIT(CONTR_LCD->PORT,E); _delay_us(1); CLR_BIT(CONTR_LCD->PORT,E); _delay_us(45)
 
 /* Stream para utilizacao do fprintf */
 FILE lcd_str = FDEV_SETUP_STREAM(lcd_putchar, NULL, _FDEV_SETUP_WRITE);
@@ -27,9 +27,9 @@ FILE *inic_stream(){
 void cmd_LCD(uint8_t c, uint8_t cd)				//c é o dado  e cd indica se é instrução ou caractere
 {
 	if(cd==0)
-		clr_bit(CONTR_LCD->PORT,RS);
+		CLR_BIT(CONTR_LCD->PORT,RS);
 	else
-		set_bit(CONTR_LCD->PORT,RS);
+		SET_BIT(CONTR_LCD->PORT,RS);
 
 	//primeiro nibble de dados - 4 MSB
 	#if (NIBBLE_DADOS)								//compila código para os pinos de dados do LCD nos 4 MSB do PORT
@@ -62,8 +62,8 @@ void inic_LCD_4bits()		//sequência ditada pelo fabricando do circuito integrado
 {							//o LCD será só escrito. Então, R/W é sempre zero.
 
 	/* Configura pinos de controle */
-	set_bit(CONTR_LCD->DDR, RS);
-	set_bit(CONTR_LCD->DDR, E);
+	SET_BIT(CONTR_LCD->DDR, RS);
+	SET_BIT(CONTR_LCD->DDR, E);
 
 	/* Configure pinos de dados */
 	#if (NIBBLE_DADOS)
@@ -72,8 +72,8 @@ void inic_LCD_4bits()		//sequência ditada pelo fabricando do circuito integrado
 		DADOS_LCD->DDR |=  0x0F;
 	#endif
 
-	clr_bit(CONTR_LCD->PORT,RS);	//RS em zero indicando que o dado para o LCD será uma instrução
-	clr_bit(CONTR_LCD->PORT,E);	//pino de habilitação em zero
+	CLR_BIT(CONTR_LCD->PORT,RS);	//RS em zero indicando que o dado para o LCD será uma instrução
+	CLR_BIT(CONTR_LCD->PORT,E);	//pino de habilitação em zero
 	
 	_delay_ms(20);	 		//tempo para estabilizar a tensão do LCD, após VCC ultrapassar 4.5 V (na prática pode
 							//ser maior). 

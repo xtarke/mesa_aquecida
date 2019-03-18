@@ -4,10 +4,10 @@
 #include "avr_onewire.h"
 
 // macros privadas
-#define DQ_OUTPUT()		set_bit(DDRx,DQ)
-#define DQ_INPUT()		clr_bit(DDRx,DQ)
-#define CLR_DQ()		clr_bit(PORTx,DQ)
-#define SET_DQ()		set_bit(PORTx,DQ)
+#define DQ_OUTPUT()		SET_BIT(DDRx,DQ)
+#define DQ_INPUT()		CLR_BIT(DDRx,DQ)
+#define CLR_DQ()		CLR_BIT(PORTx,DQ)
+#define SET_DQ()		SET_BIT(PORTx,DQ)
 #define TST_DQ()		tst_bit(PINx,DQ)
 
 //funcoes privadas
@@ -72,7 +72,7 @@ uint8_t read_byte_1w()	//lê um byte do barramento
 	for (i=0;i<8;i++)		//lê oito bits iniciando pelo bit menos significativo
 	{
 		if (read_bit_1w()) 
-			set_bit(dado,i);
+			SET_BIT(dado,i);
 	}
 	return (dado);
 }

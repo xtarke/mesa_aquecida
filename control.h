@@ -42,6 +42,9 @@ typedef struct{
 	opcao_t opcao;
 	uint8_t tempo[3];
 	state_t curr_state;
+
+	uint16_t uk;
+
 }control_t;
 
 // SM
@@ -53,6 +56,9 @@ void f_desligar();
 uint8_t tempContrl();
 void pwmContrl(uint16_t n);
 void controleInit();
+
+
+void set_uk(uint16_t i);
 
 #endif /* CONTROL_H_ */
 /*

@@ -1,6 +1,7 @@
 #include "temperatura.h"
 
 volatile uint16_t soma = 0;
+
 const uint16_t temp[] PROGMEM = {941,939,938,936,935,933,932,930,928,927,925,924,922,921,919,918,//0 473	// ADC -> 950 - 450
 								916,914,913,911,910,908,907,905,904,902,901,899,898,897,895,894, //16
 								892,891,889,888,886,885,883,882,881,879,878,876,875,873,872,871, //32
@@ -34,6 +35,7 @@ const uint16_t temp[] PROGMEM = {941,939,938,936,935,933,932,930,928,927,925,924
 								251,248,246,244,241,239,237,234,232,230,227,225,223,220,218,215, //480
 								213,211,208,206,203};
 
+
 void tempInit(){
 
 	adcInit();
@@ -42,7 +44,8 @@ void tempInit(){
 	GPIO_D->PORT |= SET(PD5);
 
 	TIMER_0->TCCRA = UNSET(COM0A1) | UNSET(COM0A0) | UNSET(COM0B1) | UNSET(COM0B0) | UNSET(WGM01) | UNSET(WGM00);
-	TIMER_0->TCCRB = SET(WGM02) | SET(CS02) | UNSET(CS01) | SET(CS00); // 17,77ms
+	//TIMER_0->TCCRB = SET(WGM02) | SET(CS02) | UNSET(CS01) | SET(CS00); // 17,77ms
+	TIMER_0->TCCRB = SET(WGM02);// | SET(CS02) | UNSET(CS01) | SET(CS00); // 17,77ms
 	TIMER_IRQS->TC0.BITS.TOIE = 1;
 }
 
@@ -94,35 +97,52 @@ ISR(ADC_vect){
 	if(i == ADC_BUFF)
 		i = 0;
 
-	set_bit(ADCS->ADC_SRA, ADSC);
-
+	SET_BIT(ADCS->ADC_SRA, ADSC);
 }
+
+volatile int16_t uk_1 = 0;
+volatile int16_t ek_1 = 0;
+
+const int16_t q0 = 1;
+const int16_t q1 = 4;
+
+/* PI u(k) = u(k - 1) + q0.e(k) + q1.e(k-1)
+           * q0 = Kc
+
+           * q1 = -KC ( 1 - Ta / Ti )
+
+           * Ta = sample time
+
+           * Ti = integral time         */
+/* u(k) = u(k-1) + 1*e(k) + (e_1)/4 */
 
 ISR(TIMER0_OVF_vect){
 
 	static uint8_t contTimer = 0;
 
+
+	static uint8_t x = 0;
+
 	if(contTimer == 6){
+		int16_t e = (int16_t)tempContrl()*10 - TempGet();
+		int16_t uk = uk_1 + q0*e - (ek_1 >> 2);
 
-		//set_bit(GPIO_D->PORT, PD5); // 4,3us
+		if (uk < 0)
+			uk = 0;
+		if (uk > 255)
+			uk = 255;
 
-		uint16_t tempAtual = TempGet();
-		uint16_t Ctemp = (uint16_t)tempContrl()*10;
-		uint16_t pwmc;
-		uint16_t difTemp = Ctemp - tempAtual;
+		set_uk(uk);
 
-		if(tempAtual < Ctemp){ // -------- Multiplicação!
-			if(difTemp <= 100)
-				pwmc = ((uint16_t)(difTemp*PWMTOP))/100;
-			else
-				pwmc = PWMTOP;
-		}
-		else
-			pwmc = 0;
+		pwmUpdate((uint8_t)uk);
 
-		pwmContrl(pwmc);
-		pwmUpdate(pwmc);
 		contTimer = 0;
+
+		uk_1 = uk;
+		ek_1 = e;
+
+		x+=10;
+
 		//cpl_bit(GPIO_D->PORT, PD5);
 	}
 	contTimer++;

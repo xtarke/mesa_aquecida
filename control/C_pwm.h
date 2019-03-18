@@ -9,4 +9,8 @@
 void pwmInit();
 void pwmUpdate(uint8_t valor);
 
+void pwmOn();
+
+void pwmOff();
+
 #endif /* C_PWM_H_ */

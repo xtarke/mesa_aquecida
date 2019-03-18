@@ -28,6 +28,7 @@ void controleInit(){
 	controle.tempo[1] = 0;
 	controle.tempo[2] = 0;
 	controle.curr_state = DESATIVO;
+	controle.uk = 0;
 	pwmInit();
 	tempInit();
 
@@ -43,11 +44,15 @@ void pwmContrl(uint16_t n){
 
 
 void f_ativo(){
+	pwmOn();
+
+
+	TIMER_0->TCCRB |=  SET(CS02) | SET(CS00); // 17,77ms
 
 	timerInit();
 
 	cmd_LCD_i2c(0x80,0);
-	fprintf(inic_stream_i2c(), "Temp.       %3dC", controle.temperatura);
+	fprintf(inic_stream_i2c(), "Temp.       %4dC", controle.uk);
 
 	cmd_LCD_i2c(0xC0,0);
 	fprintf(inic_stream_i2c(), "%2d,%1dC   %02d:%02d:%02d", TempGet()/10, TempGet()%10, controle.tempo[HOURS], controle.tempo[MINUTES], controle.tempo[SECONDS]);
@@ -58,6 +63,7 @@ void f_ativo(){
 }
 
 void f_desativo(){
+	pwmOff();
 	cmd_LCD_i2c(0x80,0);
 	fprintf(inic_stream_i2c(), "Temp.           ");
 	cmd_LCD_i2c(0xC0,0);
@@ -66,6 +72,7 @@ void f_desativo(){
 
 	_delay_ms(800);
 	stop = 0;
+
 }
 
 void f_ajuste(){
@@ -180,3 +187,8 @@ ISR(PCINT2_vect){
 	stop = 1;
 
 }
+
+void set_uk(uint16_t i){
+	controle.uk = i;
+}
+
