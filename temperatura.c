@@ -103,7 +103,7 @@ ISR(ADC_vect){
 volatile int16_t uk_1 = 0;
 volatile int16_t ek_1 = 0;
 
-const int16_t q0 = 1;
+const int16_t q0 = 3;
 const int16_t q1 = 4;
 
 /* PI u(k) = u(k - 1) + q0.e(k) + q1.e(k-1)
@@ -127,12 +127,12 @@ ISR(TIMER0_OVF_vect){
 		int16_t e = (int16_t)tempContrl()*10 - TempGet();
 		int16_t uk = uk_1 + q0*e - (ek_1 >> 2);
 
+		set_uk(uk);
+
 		if (uk < 0)
 			uk = 0;
 		if (uk > 255)
 			uk = 255;
-
-		set_uk(uk);
 
 		pwmUpdate((uint8_t)uk);
 

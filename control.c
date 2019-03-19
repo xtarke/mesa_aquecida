@@ -52,7 +52,7 @@ void f_ativo(){
 	timerInit();
 
 	cmd_LCD_i2c(0x80,0);
-	fprintf(inic_stream_i2c(), "Temp.       %4dC", controle.uk);
+	fprintf(inic_stream_i2c(), "Temp.       %x", controle.uk);
 
 	cmd_LCD_i2c(0xC0,0);
 	fprintf(inic_stream_i2c(), "%2d,%1dC   %02d:%02d:%02d", TempGet()/10, TempGet()%10, controle.tempo[HOURS], controle.tempo[MINUTES], controle.tempo[SECONDS]);

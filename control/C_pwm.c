@@ -26,6 +26,6 @@ void pwmOff(){
 
 
 void pwmUpdate(uint8_t valor){
-	if(valor < (PWMTOP))
+	if(valor < (PWMTOP + 1))
 		TIMER_2->OCRA = valor;
 }
